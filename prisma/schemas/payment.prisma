@@ -1,0 +1,22 @@
+model Payment {
+  id String @id @default(uuid())
+
+  rentalOrderId String
+  rentalOrder   RentalOrder @relation(fields: [rentalOrderId], references: [id])
+
+  transactionId String @unique
+
+  provider PaymentProvider
+
+  paymentMethod String?
+
+  amount Float
+
+  currency String @default("AUD")
+
+  status PaymentStatus @default(PENDING)
+
+  paidAt DateTime?
+
+  createdAt DateTime @default(now())
+}
