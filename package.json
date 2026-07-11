@@ -1,0 +1,25 @@
+{
+  "name": "gearup-assignment4-sakinkhan",
+  "version": "1.0.0",
+  "description": "GearUp is a backend API for a sports and outdoor equipment rental service. We will build this app for learning purposes",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/pg": "^8.20.0",
+    "tsx": "^4.23.0",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^6.19.0",
+    "@prisma/client": "^6.19.0",
+    "dotenv": "^17.4.2",
+    "pg": "^8.22.0",
+    "prisma": "^6.19.0"
+  }
+}
