@@ -2,7 +2,7 @@ model GearItem {
   id String @id @default(uuid())
 
   providerId String
-  provider   User @relation(fields: [providerId], references: [id])
+  provider   User   @relation(fields: [providerId], references: [id])
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
@@ -13,11 +13,11 @@ model GearItem {
   rentalPricePerDay Float
   depositAmount     Float?
 
-  stock           Int
-  availableStock  Int
+  stock          Int
+  availableStock Int
 
   condition GearCondition
-  status    GearStatus @default(AVAILABLE)
+  status    GearStatus    @default(AVAILABLE)
 
   image String?
 
