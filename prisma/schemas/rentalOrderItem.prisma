@@ -2,10 +2,10 @@ model RentalOrderItem {
   id String @id @default(uuid())
 
   rentalOrderId String
-  rentalOrder   RentalOrder @relation(fields: [rentalOrderId], references: [id])
+  rentalOrder   RentalOrder @relation(fields: [rentalOrderId], references: [id], onDelete: Cascade)
 
   gearItemId String
-  gearItem   GearItem @relation(fields: [gearItemId], references: [id])
+  gearItem   GearItem @relation(fields: [gearItemId], references: [id], onDelete: Cascade)
 
   quantity Int
 

@@ -32,7 +32,7 @@ const getMyUser = catchAsync(
   },
 );
 
-const updateSingleUser = catchAsync(
+const updateMyUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id as string;
 
@@ -52,5 +52,5 @@ const updateSingleUser = catchAsync(
 export const userController = {
   registerUser,
   getMyUser,
-  updateSingleUser,
+  updateMyUser,
 };

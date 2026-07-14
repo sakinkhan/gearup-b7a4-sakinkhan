@@ -4,8 +4,8 @@ model GearItem {
   providerId String
   provider   User   @relation(fields: [providerId], references: [id])
 
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  categoryName String
+  category   Category @relation(fields: [categoryName], references: [name], onUpdate: Cascade)
 
   name              String
   brand             String?
@@ -26,4 +26,10 @@ model GearItem {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([providerId])
+  @@index([categoryName])
+  @@index([status])
+  @@index([condition])
+  @@map("Gears")
 }
