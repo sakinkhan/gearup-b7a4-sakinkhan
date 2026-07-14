@@ -1,34 +1,29 @@
-import { GearCondition, GearStatus } from "../../../../generated/prisma";
-
-export interface ICreateGearPayload {
+export interface ICreateProviderGearPayload {
   categoryName: string;
   name: string;
-  brand: string;
+  brand?: string;
   description: string;
   rentalPricePerDay: number;
   depositAmount?: number;
   stock: number;
   availableStock: number;
-  condition: GearCondition;
-  status?: GearStatus;
+  condition: "NEW" | "GOOD" | "FAIR" | "USED";
   image?: string;
 }
 
-export interface IUpdateGearPayload {
+export interface IUpdateProviderGearPayload {
   categoryName?: string;
-
   name?: string;
   brand?: string;
   description?: string;
-
   rentalPricePerDay?: number;
   depositAmount?: number;
-
   stock?: number;
   availableStock?: number;
-
-  condition?: GearCondition;
-  status?: GearStatus;
-
+  condition?: "NEW" | "GOOD" | "FAIR" | "USED";
   image?: string;
+}
+
+export interface IUpdateProviderOrderStatusPayload {
+  status: "CONFIRMED" | "PICKED_UP" | "RETURNED";
 }
