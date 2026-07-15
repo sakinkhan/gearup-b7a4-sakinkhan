@@ -29,6 +29,22 @@ const addGearInDB = async (
   return result;
 };
 
+const getMyGearsFromDB = async (providerId: string) => {
+  const myGears = await prisma.gearItem.findMany({
+    where: {
+      providerId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      reviews: true,
+    },
+  });
+
+  return myGears;
+};
+
 const updateGearInDB = async (
   id: string,
   payload: IUpdateProviderGearPayload,
@@ -156,6 +172,7 @@ const updateOrderStatusInDB = async (
 
 export const providerService = {
   addGearInDB,
+  getMyGearsFromDB,
   updateGearInDB,
   deleteGearInDB,
   getIncomingOrdersFromDB,

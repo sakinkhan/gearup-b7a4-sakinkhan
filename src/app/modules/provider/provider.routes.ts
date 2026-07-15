@@ -6,7 +6,16 @@ import { providerController } from "./provider.controller";
 const router = Router();
 
 router.post("/gear", auth(UserRole.PROVIDER), providerController.addGear);
-router.put("/gear/:id", auth(UserRole.PROVIDER), providerController.updateGear);
+router.get(
+  "/my-gears",
+  auth(UserRole.ADMIN, UserRole.PROVIDER),
+  providerController.getMyGears,
+);
+router.patch(
+  "/gear/:id",
+  auth(UserRole.PROVIDER),
+  providerController.updateGear,
+);
 router.delete(
   "/gear/:id",
   auth(UserRole.PROVIDER),

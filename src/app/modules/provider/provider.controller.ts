@@ -16,6 +16,18 @@ const addGear = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyGears = catchAsync(async (req: Request, res: Response) => {
+  const providerId = req.user?.id;
+  const result = await providerService.getMyGearsFromDB(providerId as string);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "My Gears retrieved successfully",
+    data: result,
+  });
+});
+
 const updateGear = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const providerId = req.user!.id;
@@ -77,6 +89,7 @@ const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
 
 export const providerController = {
   addGear,
+  getMyGears,
   updateGear,
   deleteGear,
   getIncomingOrders,

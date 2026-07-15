@@ -11,7 +11,7 @@ router.patch(
   auth(UserRole.ADMIN),
   adminController.updateUserStatus,
 );
-router.get("/gear", auth(UserRole.ADMIN), adminController.getAllGearListings);
+router.get("/gears", auth(UserRole.ADMIN), adminController.getAllGearListings);
 router.get(
   "/rentals",
   auth(UserRole.ADMIN),

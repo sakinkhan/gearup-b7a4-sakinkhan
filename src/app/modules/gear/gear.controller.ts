@@ -4,43 +4,9 @@ import { gearService } from "./gear.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
 
-const createGear = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.user?.id;
-    const payload = req.body;
-
-    const result = await gearService.createGear(payload, id as string);
-
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.CREATED,
-      message: "Gear created successfully",
-      data: result,
-    });
-  },
-);
-
 const getAllGears = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const result = await gearService.getAllGears();
-
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: "Gear retrieved successfully",
-      data: result,
-    });
-  },
-);
-
-const getAllGearCategories = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {},
-);
-
-const getMyGears = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const providerId = req.user?.id;
-    const result = await gearService.getMyGears(providerId as string);
 
     sendResponse(res, {
       success: true,
@@ -55,9 +21,8 @@ const getGearById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const gearId = req.params.gearId;
     if (!gearId) {
-      throw new Error("GearId required in params");
+      throw new Error("Gear Id Required In Params");
     }
-
     const result = await gearService.getGearById(gearId as string);
 
     sendResponse(res, {
@@ -69,61 +34,7 @@ const getGearById = catchAsync(
   },
 );
 
-const updateGear = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const providerId = req.user?.id;
-    const isAdmin = req.user?.role === "ADMIN";
-    const gearId = req.params.gearId;
-    if (!gearId) {
-      throw new Error("GearId required in params");
-    }
-    const payload = req.body;
-
-    const result = await gearService.updateGear(
-      gearId as string,
-      payload,
-      providerId as string,
-      isAdmin,
-    );
-
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: "Gear updated successfully",
-      data: result,
-    });
-  },
-);
-const deleteGear = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const providerId = req.user?.id;
-    const isAdmin = req.user?.role === "ADMIN";
-    const gearId = req.params.gearId;
-    if (!gearId) {
-      throw new Error("GearId required in params");
-    }
-
-    await gearService.deleteGear(
-      gearId as string,
-      providerId as string,
-      isAdmin,
-    );
-
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: "Gear deleted successfully",
-      data: null,
-    });
-  },
-);
-
 export const gearController = {
-  createGear,
   getAllGears,
-  getAllGearCategories,
-  getMyGears,
   getGearById,
-  updateGear,
-  deleteGear,
 };
