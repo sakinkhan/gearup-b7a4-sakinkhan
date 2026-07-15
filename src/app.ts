@@ -11,6 +11,7 @@ import { rentalRoutes } from "./app/modules/rental/rental.routes";
 import { reviewRoutes } from "./app/modules/review/review.routes";
 import { adminRoutes } from "./app/modules/admin/admin.routes";
 import { providerRoutes } from "./app/modules/provider/provider.routes";
+import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 
 const app: Application = express();
 
@@ -39,4 +40,11 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/provider", providerRoutes);
 
+app.use((req: Request, res: Response) => {
+  res.status(404).json({
+    success: false,
+    message: "API Not Found",
+  });
+});
+app.use(globalErrorHandler);
 export default app;

@@ -15,7 +15,7 @@ router.get("/", gearController.getAllGears);
 
 router.get(
   "/my-gears",
-  auth(UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PROVIDER),
+  auth(UserRole.ADMIN, UserRole.PROVIDER),
   gearController.getMyGears,
 );
 
