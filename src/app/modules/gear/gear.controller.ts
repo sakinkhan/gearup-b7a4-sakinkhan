@@ -42,7 +42,21 @@ const getMyGears = catchAsync(
 );
 
 const getGearById = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {},
+  async (req: Request, res: Response, next: NextFunction) => {
+    const gearId = req.params.gearId;
+    if (!gearId) {
+      throw new Error("GearId required in params");
+    }
+
+    const result = await gearService.getGearById(gearId as string);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Gear retrieved successfully",
+      data: result,
+    });
+  },
 );
 
 const updateGear = catchAsync(
