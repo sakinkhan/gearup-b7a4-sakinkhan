@@ -7,7 +7,7 @@
     "lib": ["ESNext"],
 
     "outDir": "./dist",
-    // "rootDir": "./src",
+    "rootDir": "./src",
 
     "types": ["node", "express"],
 
@@ -23,6 +23,6 @@
 
     "moduleDetection": "force"
   },
-  "include": ["src"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
