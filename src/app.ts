@@ -32,7 +32,7 @@ app.use(
 app.get("/", async (req: Request, res: Response) => {
   const user = await prisma.user.findMany();
   console.log(user);
-  res.send("Hello World!");
+  res.send("Welcome to GearUp");
 });
 
 app.use("/api/auth", authRoutes);
