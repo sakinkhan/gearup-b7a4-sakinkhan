@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import config from "../../config";
 
 const globalErrorHandler = (
   err: any,
@@ -11,9 +12,11 @@ const globalErrorHandler = (
 
   res.status(statusCode).json({
     success: false,
-    statusCode: statusCode,
     message,
-    error: err,
+    errorDetails: {
+      name: err.name,
+      ...(config.node_env === "development" && { stack: err.stack }),
+    },
   });
 };
 

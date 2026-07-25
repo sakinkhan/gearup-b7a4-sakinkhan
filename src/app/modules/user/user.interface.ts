@@ -5,7 +5,7 @@ export interface RegisterUserPayload {
   email: string;
   password: string;
   image?: string;
-  role: UserRole;
+  role: Exclude<UserRole, "ADMIN">;
 }
 
 export type UpdateUserPayload = Partial<{

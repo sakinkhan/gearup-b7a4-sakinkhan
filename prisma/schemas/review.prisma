@@ -15,4 +15,6 @@ model Review {
   comment String?
 
   createdAt DateTime @default(now())
+
+  @@unique([customerId, gearItemId, rentalOrderId])
 }

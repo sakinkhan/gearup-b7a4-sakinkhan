@@ -6,7 +6,7 @@ import httpStatus from "http-status";
 
 const getAllGears = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const result = await gearService.getAllGears();
+    const result = await gearService.getAllGears(req.query);
 
     sendResponse(res, {
       success: true,

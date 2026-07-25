@@ -13,6 +13,9 @@ const registerUserIntoDB = async (payload: RegisterUserPayload) => {
   if (existingUser) {
     throw new Error("User already exists.");
   }
+  if (role !== "CUSTOMER" && role !== "PROVIDER") {
+    throw new Error("Invalid role. Must be CUSTOMER or PROVIDER.");
+  }
 
   const hashedPassword = await bcrypt.hash(
     password,
@@ -25,7 +28,7 @@ const registerUserIntoDB = async (payload: RegisterUserPayload) => {
       email,
       password: hashedPassword,
       image,
-      role,
+      role, 
     },
     omit: {
       password: true,

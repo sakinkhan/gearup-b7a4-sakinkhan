@@ -32,3 +32,11 @@ export interface IUpdateGearPayload {
 
   image?: string;
 }
+
+export interface IGearFilters {
+  categoryName?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  brand?: string;
+  availableOnly?: string;
+}

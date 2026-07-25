@@ -5,8 +5,16 @@ import {
 } from "./category.interface";
 
 const createCategoryInDB = async (payload: ICreateCategoryPayload) => {
+  const { name, description, image } = payload;
+
+  if (!name || typeof name !== "string" || !name.trim()) {
+    throw new Error("Category name is required");
+  }
+
+  const trimmedName = name.trim();
+
   const existingCategory = await prisma.category.findUnique({
-    where: { name: payload.name },
+    where: { name: trimmedName },
   });
 
   if (existingCategory) {
@@ -14,7 +22,11 @@ const createCategoryInDB = async (payload: ICreateCategoryPayload) => {
   }
 
   const result = await prisma.category.create({
-    data: payload,
+    data: {
+      name: trimmedName,
+      description,
+      image,
+    },
   });
 
   return result;
@@ -52,13 +64,20 @@ const updateCategoryInDB = async (
     throw new Error("Category not found");
   }
 
-  if (payload.name && payload.name !== name) {
-    const nameTaken = await prisma.category.findUnique({
-      where: { name: payload.name },
-    });
+  if (payload.name !== undefined) {
+    if (typeof payload.name !== "string" || !payload.name.trim()) {
+      throw new Error("Category name cannot be empty");
+    }
+    payload.name = payload.name.trim();
 
-    if (nameTaken) {
-      throw new Error("A category with this name already exists");
+    if (payload.name !== name) {
+      const nameTaken = await prisma.category.findUnique({
+        where: { name: payload.name },
+      });
+
+      if (nameTaken) {
+        throw new Error("A category with this name already exists");
+      }
     }
   }
 
