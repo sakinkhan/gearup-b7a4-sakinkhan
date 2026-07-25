@@ -9,7 +9,7 @@ model RentalOrderItem {
 
   quantity Int
 
-  pricePerDay Float
+  pricePerDay Decimal
 
-  totalPrice Float
+  totalPrice Decimal
 }

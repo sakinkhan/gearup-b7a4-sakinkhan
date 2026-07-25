@@ -38,7 +38,7 @@ enum PaymentProvider {
 
 enum PaymentStatus {
   PENDING
-  COMPLETED
+  PAID
   FAILED
   REFUNDED
 }

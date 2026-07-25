@@ -10,8 +10,8 @@ model GearItem {
   name              String
   brand             String?
   description       String
-  rentalPricePerDay Float
-  depositAmount     Float?
+  rentalPricePerDay Decimal
+  depositAmount     Decimal?
 
   stock          Int
   availableStock Int

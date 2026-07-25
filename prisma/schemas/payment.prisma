@@ -10,7 +10,7 @@ model Payment {
 
   paymentMethod String?
 
-  amount Float
+  amount Decimal
 
   currency String @default("AUD")
 
