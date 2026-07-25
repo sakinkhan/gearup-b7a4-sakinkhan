@@ -121,6 +121,12 @@ const getIncomingOrdersFromDB = async (providerId: string) => {
   return result;
 };
 
+const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+  CONFIRMED: ["PLACED"],
+  PICKED_UP: ["PAID"],
+  RETURNED: ["PICKED_UP"],
+};
+
 const updateOrderStatusInDB = async (
   rentalOrderId: string,
   payload: IUpdateProviderOrderStatusPayload,
@@ -149,25 +155,12 @@ const updateOrderStatusInDB = async (
     throw new Error("You do not have any gear items in this rental order");
   }
 
-  const result = await prisma.$transaction(async (tx) => {
-    const updatedOrder = await tx.rentalOrder.update({
-      where: { id: rentalOrderId },
-      data: { status: payload.status },
-    });
-
-    if (payload.status === "RETURNED") {
-      for (const item of rentalOrder.rentalItems) {
-        await tx.gearItem.update({
-          where: { id: item.gearItemId },
-          data: { availableStock: { increment: item.quantity } },
-        });
-      }
-    }
-
-    return updatedOrder;
-  });
-
-  return result;
+  const allowedFrom = ALLOWED_TRANSITIONS[payload.status]!;
+  if (!allowedFrom.includes(rentalOrder.status)) {
+    throw new Error(
+      `Cannot move order from ${rentalOrder.status} to ${payload.status}`,
+    );
+  }
 };
 
 export const providerService = {

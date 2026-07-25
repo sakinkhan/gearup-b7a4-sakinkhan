@@ -56,13 +56,14 @@ const createRentalOrderInDB = async (
         );
       }
 
-      const totalPrice = gearItem.rentalPricePerDay * item.quantity * totalDays;
+      const pricePerDay = Number(gearItem.rentalPricePerDay);
+      const totalPrice = pricePerDay * item.quantity * totalDays;
       totalAmount += totalPrice;
 
       orderItemsData.push({
         gearItemId: gearItem.id,
         quantity: item.quantity,
-        pricePerDay: gearItem.rentalPricePerDay,
+        pricePerDay,
         totalPrice,
       });
 
@@ -137,8 +138,51 @@ const getRentalOrderByIdFromDB = async (
   return rentalOrder;
 };
 
+const cancelRentalOrderInDB = async (
+  id: string,
+  customerId: string,
+  role: string,
+) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const rentalOrder = await tx.rentalOrder.findUnique({
+      where: { id },
+      include: { rentalItems: true },
+    });
+
+    if (!rentalOrder) {
+      throw new Error("Rental order not found");
+    }
+
+    if (rentalOrder.customerId !== customerId && role !== "ADMIN") {
+      throw new Error("You do not have access to this rental order");
+    }
+
+    if (rentalOrder.status !== "PLACED") {
+      throw new Error(
+        `Only orders with status PLACED can be cancelled (current status: ${rentalOrder.status})`,
+      );
+    }
+
+    // Restore stock since the order never proceeded
+    for (const item of rentalOrder.rentalItems) {
+      await tx.gearItem.update({
+        where: { id: item.gearItemId },
+        data: { availableStock: { increment: item.quantity } },
+      });
+    }
+
+    return tx.rentalOrder.update({
+      where: { id },
+      data: { status: "CANCELLED" },
+    });
+  });
+
+  return result;
+};
+
 export const rentalService = {
   createRentalOrderInDB,
   getRentalOrdersByUserFromDB,
   getRentalOrderByIdFromDB,
+  cancelRentalOrderInDB,
 };

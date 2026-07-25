@@ -7,5 +7,6 @@ const router = Router();
 router.post("/", auth(), rentalController.createRentalOrder);
 router.get("/", auth(), rentalController.getMyRentalOrders);
 router.get("/:id", auth(), rentalController.getRentalOrderById);
+router.patch("/:id/cancel", auth(), rentalController.cancelRentalOrder);
 
 export const rentalRoutes = router;

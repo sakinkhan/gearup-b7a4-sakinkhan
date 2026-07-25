@@ -21,6 +21,11 @@ const createPaymentInDB = async (
     if (rentalOrder?.customerId !== customerId && role !== "ADMIN") {
       throw new Error("You do not have access to this rental order");
     }
+    if (rentalOrder.status !== "CONFIRMED") {
+      throw new Error(
+        "Rental order must be confirmed by the provider before payment",
+      );
+    }
 
     const user = await tx.user.findUniqueOrThrow({
       where: {
@@ -131,7 +136,7 @@ const confirmPaymentInDB = async (
 
     await tx.rentalOrder.update({
       where: { id: payment.rentalOrderId },
-      data: { status: "CONFIRMED" },
+      data: { status: "PAID" },
     });
 
     return updated;
@@ -218,7 +223,7 @@ const handleWebhook = async (payload: Buffer, signature: string) => {
 
         await tx.rentalOrder.update({
           where: { id: payment.rentalOrderId },
-          data: { status: "CONFIRMED" },
+          data: { status: "PAID" }, // was: "CONFIRMED"
         });
       });
 
@@ -237,7 +242,6 @@ const handleWebhook = async (payload: Buffer, signature: string) => {
     }
 
     default:
-      // Unhandled event types are fine to ignore
       break;
   }
 

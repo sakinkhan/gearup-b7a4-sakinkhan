@@ -33,6 +33,8 @@ const loginUser = catchAsync(
   },
 );
 
+const getMe = catchAsync(async (req: Request, res: Response, next: NextFunction)=> {})
+
 const refreshToken = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies.refreshToken;
@@ -59,5 +61,6 @@ const refreshToken = catchAsync(
 
 export const authController = {
   loginUser,
+  getMe,
   refreshToken,
 };
