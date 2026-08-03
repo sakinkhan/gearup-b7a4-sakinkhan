@@ -24,14 +24,22 @@ app.use(cookieParser());
 app.use(urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: config.app_url,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+
+      if (config.allowed_origins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   }),
 );
 
 app.get("/", async (req: Request, res: Response) => {
   const user = await prisma.user.findMany();
-  console.log(user);
+  // console.log(user);
   res.send("Welcome to GearUp");
 });
 

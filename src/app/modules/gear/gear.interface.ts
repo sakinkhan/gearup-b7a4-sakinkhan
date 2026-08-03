@@ -34,9 +34,13 @@ export interface IUpdateGearPayload {
 }
 
 export interface IGearFilters {
+  search?: string;
   categoryName?: string;
-  minPrice?: string;
-  maxPrice?: string;
   brand?: string;
+  minPrice?: number;
+  maxPrice?: number;
   availableOnly?: string;
+  status?: "AVAILABLE" | "UNAVAILABLE" | "INACTIVE";
+  page?: number;
+  limit?: number;
 }

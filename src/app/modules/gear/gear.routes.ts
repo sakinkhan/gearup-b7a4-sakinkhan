@@ -7,6 +7,10 @@ const router = Router();
 
 router.get("/", gearController.getAllGears);
 
-router.get("/:gearId", gearController.getGearById);
+router.get(
+  "/:gearId",
+  auth(UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PROVIDER),
+  gearController.getGearById,
+);
 
 export const gearRoutes = router;
