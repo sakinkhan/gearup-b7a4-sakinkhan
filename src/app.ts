@@ -17,6 +17,11 @@ import { stripe } from "./lib/stripe";
 
 const app: Application = express();
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_PROD_URL,
+];
+
 app.use("/api/payments/webhook", express.raw({ type: "application/json" }));
 
 app.use(express.json());
@@ -25,13 +30,11 @@ app.use(urlencoded({ extended: true }));
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-
-      if (config.allowed_origins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
       }
-
-      return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
   }),
@@ -40,7 +43,7 @@ app.use(
 app.get("/", async (req: Request, res: Response) => {
   const user = await prisma.user.findMany();
   // console.log(user);
-  res.send("Welcome to GearUp");
+  res.send("Welcome to GearUp Backend API");
 });
 
 app.use("/api/auth", authRoutes);

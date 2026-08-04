@@ -21,9 +21,9 @@ const createPaymentInDB = async (
     if (rentalOrder?.customerId !== customerId && role !== "ADMIN") {
       throw new Error("You do not have access to this rental order");
     }
-    if (rentalOrder.status !== "CONFIRMED") {
+    if (rentalOrder.status !== "PENDING_PAYMENT") {
       throw new Error(
-        "Rental order must be confirmed by the provider before payment",
+        `This rental order cannot be paid because its current status is "${rentalOrder.status}".`,
       );
     }
 
@@ -74,8 +74,8 @@ const createPaymentInDB = async (
       mode: "payment",
       customer: stripeCustomerId,
       payment_method_types: ["card"],
-      success_url: `${config.app_url}/rentals/${rentalOrder.id}?success=true`,
-      cancel_url: `${config.app_url}/rentals/${rentalOrder.id}?success=false`,
+      success_url: `${config.app_url}/payment/success?orderId=${rentalOrder.id}`,
+      cancel_url: `${config.app_url}/payment/cancel?orderId=${rentalOrder.id}`,
       metadata: { rentalOrderId: rentalOrder.id },
     });
 
@@ -223,7 +223,9 @@ const handleWebhook = async (payload: Buffer, signature: string) => {
 
         await tx.rentalOrder.update({
           where: { id: payment.rentalOrderId },
-          data: { status: "PAID" }, // was: "CONFIRMED"
+          data: {
+            status: "PAID",
+          },
         });
       });
 

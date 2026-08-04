@@ -24,10 +24,12 @@ enum GearCondition {
 
 enum RentalStatus {
   PLACED
-  CONFIRMED
+  PENDING_PAYMENT
   PAID
+  CONFIRMED
   PICKED_UP
   RETURNED
+  COMPLETED
   CANCELLED
 }
 
