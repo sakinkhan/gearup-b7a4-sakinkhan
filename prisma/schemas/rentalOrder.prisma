@@ -11,7 +11,7 @@ model RentalOrder {
 
   totalDays Int
 
-  status RentalStatus @default(PLACED)
+  status RentalStatus @default(PENDING_PAYMENT)
 
   notes String?
 

@@ -76,6 +76,7 @@ const createRentalOrderInDB = async (
     const rentalOrder = await tx.rentalOrder.create({
       data: {
         customerId,
+        status: "PENDING_PAYMENT",
         totalAmount,
         rentalStartDate: startDate,
         rentalEndDate: endDate,
@@ -157,9 +158,9 @@ const cancelRentalOrderInDB = async (
       throw new Error("You do not have access to this rental order");
     }
 
-    if (rentalOrder.status !== "PLACED") {
+    if (rentalOrder.status !== "PENDING_PAYMENT") {
       throw new Error(
-        `Only orders with status PLACED can be cancelled (current status: ${rentalOrder.status})`,
+        `Only orders with status PENDING_PAYMENT can be cancelled (current status: ${rentalOrder.status})`,
       );
     }
 
