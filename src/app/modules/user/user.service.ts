@@ -28,7 +28,7 @@ const registerUserIntoDB = async (payload: RegisterUserPayload) => {
       email,
       password: hashedPassword,
       image,
-      role, 
+      role,
     },
     omit: {
       password: true,

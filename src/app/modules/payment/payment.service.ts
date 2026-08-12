@@ -16,7 +16,15 @@ const createPaymentInDB = async (
   const transactionResult = await prisma.$transaction(async (tx) => {
     const rentalOrder = await tx.rentalOrder.findUniqueOrThrow({
       where: { id: rentalOrderId },
+      include: {
+        rentalItems: {
+          take: 1,
+          select: { gearItemId: true },
+        },
+      },
     });
+
+    const gearId = rentalOrder.rentalItems[0]?.gearItemId;
 
     if (rentalOrder?.customerId !== customerId && role !== "ADMIN") {
       throw new Error("You do not have access to this rental order");
@@ -74,8 +82,10 @@ const createPaymentInDB = async (
       mode: "payment",
       customer: stripeCustomerId,
       payment_method_types: ["card"],
-      success_url: `${config.app_url}/payment/success?orderId=${rentalOrder.id}`,
-      cancel_url: `${config.app_url}/payment/cancel?orderId=${rentalOrder.id}`,
+      success_url: `${config.frontend_url}/payment/success?orderId=${rentalOrder.id}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${config.frontend_url}/payment/cancel?orderId=${rentalOrder.id}${
+        gearId ? `&gearId=${gearId}` : ""
+      }`,
       metadata: { rentalOrderId: rentalOrder.id },
     });
 
@@ -201,6 +211,9 @@ const handleWebhook = async (payload: Buffer, signature: string) => {
       `Webhook signature verification failed: ${(err as Error).message}`,
     );
   }
+
+  console.log("Stripe webhook received");
+  console.log("Event type:", event.type);
 
   switch (event.type) {
     case "checkout.session.completed": {

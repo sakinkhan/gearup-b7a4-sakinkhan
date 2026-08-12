@@ -104,13 +104,35 @@ const getRentalOrdersByUserFromDB = async (customerId: string) => {
     where: { customerId },
     include: {
       rentalItems: {
-        include: { gearItem: true },
+        include: {
+          gearItem: true,
+        },
       },
     },
     orderBy: { createdAt: "desc" },
   });
 
-  return result;
+  const reviews = await prisma.review.findMany({
+    where: {
+      customerId,
+    },
+    select: {
+      gearItemId: true,
+      rentalOrderId: true,
+    },
+  });
+
+  const reviewedKeys = new Set(
+    reviews.map((review) => `${review.rentalOrderId}:${review.gearItemId}`),
+  );
+
+  return result.map((order) => ({
+    ...order,
+    rentalItems: order.rentalItems.map((item) => ({
+      ...item,
+      hasReviewed: reviewedKeys.has(`${order.id}:${item.gearItemId}`),
+    })),
+  }));
 };
 
 const getRentalOrderByIdFromDB = async (
@@ -181,9 +203,66 @@ const cancelRentalOrderInDB = async (
   return result;
 };
 
+const returnRentalOrderInDB = async (id: string, customerId: string) => {
+  const rentalOrder = await prisma.rentalOrder.findUnique({
+    where: { id },
+    include: {
+      rentalItems: true,
+    },
+  });
+
+  if (!rentalOrder) {
+    throw new Error("Rental order not found");
+  }
+
+  if (rentalOrder.customerId !== customerId) {
+    throw new Error("You do not have access to this rental order");
+  }
+
+  if (rentalOrder.status !== "PICKED_UP") {
+    throw new Error(
+      `Only picked-up orders can be returned (current status: ${rentalOrder.status})`,
+    );
+  }
+
+  const result = await prisma.$transaction(async (tx) => {
+    for (const item of rentalOrder.rentalItems) {
+      await tx.gearItem.update({
+        where: {
+          id: item.gearItemId,
+        },
+        data: {
+          availableStock: {
+            increment: item.quantity,
+          },
+        },
+      });
+    }
+
+    return tx.rentalOrder.update({
+      where: {
+        id,
+      },
+      data: {
+        status: "RETURNED",
+      },
+      include: {
+        rentalItems: {
+          include: {
+            gearItem: true,
+          },
+        },
+      },
+    });
+  });
+
+  return result;
+};
+
 export const rentalService = {
   createRentalOrderInDB,
   getRentalOrdersByUserFromDB,
   getRentalOrderByIdFromDB,
   cancelRentalOrderInDB,
+  returnRentalOrderInDB,
 };

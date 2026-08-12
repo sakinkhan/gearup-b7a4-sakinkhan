@@ -1,12 +1,18 @@
 import { Router } from "express";
 import { auth } from "../../middlewares/auth.js";
 import { rentalController } from "./rental.controller.js";
+import { UserRole } from "../../../../generated/prisma/index.js";
 
 const router = Router();
 
 router.post("/", auth(), rentalController.createRentalOrder);
 router.get("/", auth(), rentalController.getMyRentalOrders);
 router.get("/:id", auth(), rentalController.getRentalOrderById);
+router.patch(
+  "/:id/return",
+  auth(UserRole.CUSTOMER),
+  rentalController.returnRentalOrder,
+);
 router.patch("/:id/cancel", auth(), rentalController.cancelRentalOrder);
 
 export const rentalRoutes = router;

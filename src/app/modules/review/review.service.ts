@@ -24,7 +24,7 @@ const createReviewInDB = async (
     throw new Error("You can only review rental orders that belong to you");
   }
 
-  if (rentalOrder.status !== "RETURNED") {
+  if (rentalOrder.status !== "RETURNED" && rentalOrder.status !== "COMPLETED") {
     throw new Error(
       "You can only review a gear item after the rental has been returned",
     );
