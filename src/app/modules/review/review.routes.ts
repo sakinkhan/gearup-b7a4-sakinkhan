@@ -6,5 +6,10 @@ import { reviewController } from "./review.controller";
 const router = Router();
 
 router.post("/", auth(UserRole.CUSTOMER), reviewController.createReview);
+router.get(
+  "/myReviews",
+  auth(UserRole.CUSTOMER),
+  reviewController.getMyReviews,
+);
 
 export const reviewRoutes = router;

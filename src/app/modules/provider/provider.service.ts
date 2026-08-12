@@ -7,6 +7,12 @@ import {
 
 const ALLOWED_PROVIDER_STATUSES = ["CONFIRMED", "PICKED_UP", "RETURNED"];
 
+const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+  CONFIRMED: ["PAID"],
+  PICKED_UP: ["CONFIRMED"],
+  RETURNED: ["PICKED_UP"],
+};
+
 const addGearInDB = async (
   payload: ICreateProviderGearPayload,
   providerId: string,
@@ -103,28 +109,77 @@ const deleteGearInDB = async (id: string, providerId: string) => {
 const getIncomingOrdersFromDB = async (providerId: string) => {
   const result = await prisma.rentalOrderItem.findMany({
     where: {
-      gearItem: { providerId },
+      gearItem: {
+        providerId,
+      },
     },
     include: {
       gearItem: true,
       rentalOrder: {
         include: {
           customer: {
-            select: { id: true, name: true, email: true },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
           },
         },
       },
     },
-    orderBy: { rentalOrder: { createdAt: "desc" } },
+    orderBy: {
+      rentalOrder: {
+        createdAt: "desc",
+      },
+    },
   });
 
-  return result;
-};
+  const groupedOrders = new Map<
+    string,
+    {
+      id: string;
+      customerId: string;
+      totalAmount: string;
+      rentalStartDate: Date;
+      rentalEndDate: Date;
+      totalDays: number;
+      status: string;
+      notes: string;
+      createdAt: Date;
+      updatedAt: Date;
+      customer: {
+        id: string;
+        name: string;
+        email: string;
+      };
+      rentalItems: typeof result;
+    }
+  >();
 
-const ALLOWED_TRANSITIONS: Record<string, string[]> = {
-  CONFIRMED: ["PLACED"],
-  PICKED_UP: ["PAID"],
-  RETURNED: ["PICKED_UP"],
+  for (const item of result) {
+    const order = item.rentalOrder;
+
+    if (!groupedOrders.has(order.id)) {
+      groupedOrders.set(order.id, {
+        id: order.id,
+        customerId: order.customerId,
+        totalAmount: order.totalAmount.toString(),
+        rentalStartDate: order.rentalStartDate,
+        rentalEndDate: order.rentalEndDate,
+        totalDays: order.totalDays,
+        status: order.status,
+        notes: order.notes ?? "",
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+        customer: order.customer,
+        rentalItems: [],
+      });
+    }
+
+    groupedOrders.get(order.id)!.rentalItems.push(item);
+  }
+
+  return Array.from(groupedOrders.values());
 };
 
 const updateOrderStatusInDB = async (
@@ -140,7 +195,13 @@ const updateOrderStatusInDB = async (
 
   const rentalOrder = await prisma.rentalOrder.findUnique({
     where: { id: rentalOrderId },
-    include: { rentalItems: { include: { gearItem: true } } },
+    include: {
+      rentalItems: {
+        include: {
+          gearItem: true,
+        },
+      },
+    },
   });
 
   if (!rentalOrder) {
@@ -155,12 +216,39 @@ const updateOrderStatusInDB = async (
     throw new Error("You do not have any gear items in this rental order");
   }
 
-  const allowedFrom = ALLOWED_TRANSITIONS[payload.status]!;
-  if (!allowedFrom.includes(rentalOrder.status)) {
+  const allowedFrom = ALLOWED_TRANSITIONS[payload.status];
+
+  if (!allowedFrom?.includes(rentalOrder.status)) {
     throw new Error(
       `Cannot move order from ${rentalOrder.status} to ${payload.status}`,
     );
   }
+
+  // Actually update the order status
+  const updatedOrder = await prisma.rentalOrder.update({
+    where: {
+      id: rentalOrderId,
+    },
+    data: {
+      status: payload.status,
+    },
+    include: {
+      customer: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      rentalItems: {
+        include: {
+          gearItem: true,
+        },
+      },
+    },
+  });
+
+  return updatedOrder;
 };
 
 export const providerService = {
