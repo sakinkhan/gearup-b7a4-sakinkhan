@@ -72,7 +72,12 @@ const getAllGears = async (filters: IGearFilters) => {
     };
   }
 
-  if (status) {
+  if (status === "AVAILABLE") {
+    where.status = "AVAILABLE";
+    where.availableStock = {
+      gt: 0,
+    };
+  } else if (status) {
     where.status = status;
   }
 
@@ -133,7 +138,20 @@ const getGearById = async (gearId: string) => {
           password: true,
         },
       },
-      reviews: true,
+      reviews: {
+        include: {
+          customer: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
     },
   });
 
