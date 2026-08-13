@@ -41,6 +41,22 @@ const getAllGearListings = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateGearStatus = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const result = await adminService.updateGearStatusInDB(id as string, status);
+
+  return res.status(200).json({
+    success: true,
+    statusCode: 200,
+    message: `Gear listing ${
+      status === "INACTIVE" ? "deactivated" : "reactivated"
+    } successfully`,
+    data: result,
+  });
+});
+
 const getAllRentalOrders = catchAsync(async (req: Request, res: Response) => {
   const result = await adminService.getAllRentalOrdersFromDB();
 
@@ -56,5 +72,6 @@ export const adminController = {
   getAllUsers,
   updateUserStatus,
   getAllGearListings,
+  updateGearStatus,
   getAllRentalOrders,
 };

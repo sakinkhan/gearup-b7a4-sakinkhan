@@ -55,6 +55,30 @@ const getAllGearListingsFromDB = async () => {
   return result;
 };
 
+const updateGearStatusInDB = async (
+  id: string,
+  status: "AVAILABLE" | "INACTIVE",
+) => {
+  const existingGear = await prisma.gearItem.findUnique({
+    where: { id },
+  });
+
+  if (!existingGear) {
+    throw new Error("Gear listing not found");
+  }
+
+  if (!["AVAILABLE", "INACTIVE"].includes(status)) {
+    throw new Error("Gear status must be AVAILABLE or INACTIVE");
+  }
+
+  return prisma.gearItem.update({
+    where: { id },
+    data: {
+      status,
+    },
+  });
+};
+
 const getAllRentalOrdersFromDB = async () => {
   const result = await prisma.rentalOrder.findMany({
     include: {
@@ -75,5 +99,6 @@ export const adminService = {
   getAllUsersFromDB,
   updateUserStatusInDB,
   getAllGearListingsFromDB,
+  updateGearStatusInDB,
   getAllRentalOrdersFromDB,
 };
