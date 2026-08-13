@@ -1,7 +1,6 @@
 import express, { Application, Request, Response, urlencoded } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import config from "./config";
 import { prisma } from "./lib/prisma";
 import { authRoutes } from "./app/modules/auth/auth.routes";
 import { userRoutes } from "./app/modules/user/user.routes";
@@ -20,13 +19,19 @@ const app: Application = express();
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.FRONTEND_PROD_URL,
-];
+  "http://localhost:3000",
+].filter(Boolean);
 
 app.use("/api/payments/webhook", express.raw({ type: "application/json" }));
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(urlencoded({ extended: true }));
+
+console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
+console.log("FRONTEND_PROD_URL:", process.env.FRONTEND_PROD_URL);
+console.log("ALLOWED ORIGINS:", allowedOrigins);
+
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -42,7 +47,6 @@ app.use(
 
 app.get("/", async (req: Request, res: Response) => {
   const user = await prisma.user.findMany();
-  // console.log(user);
   res.send("Welcome to GearUp Backend API");
 });
 
