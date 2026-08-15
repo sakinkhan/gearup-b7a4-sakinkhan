@@ -65,7 +65,7 @@ const createPaymentInDB = async (
         },
       });
     }
-
+    console.log("Stripe frontend URL:", config.frontend_url);
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
